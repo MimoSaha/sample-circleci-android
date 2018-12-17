@@ -67,15 +67,3 @@ jobs:
           paths:
           - ~/.gradle
           key: gradle-{{ checksum "build.gradle" }}
-      - run:
-          name: Run Detekt
-          command: ./gradlew detekt
-      - run:
-          name: Run Ktlint
-          command: ./gradlew ktlint
-      - run:
-          name: Run Lint
-          command: ./gradlew lintDebug
-      - run:
-          name: Run Unit Tests
-          command: ./gradlew testDebugUnitTest
