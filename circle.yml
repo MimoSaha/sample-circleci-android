@@ -1,42 +1,81 @@
-# Java Gradle CircleCI 2.0 configuration file
+## Java Gradle CircleCI 2.0 configuration file
+##
+## Check https://circleci.com/docs/2.0/language-java/ for more details
+##
+#version: 2
+#jobs:
+#  build:
+#    docker:
+#      # specify the version you desire here
+#      - image: circleci/openjdk:8-jdk
 #
-# Check https://circleci.com/docs/2.0/language-java/ for more details
+#      # Specify service dependencies here if necessary
+#      # CircleCI maintains a library of pre-built images
+#      # documented at https://circleci.com/docs/2.0/circleci-images/
+#      # - image: circleci/postgres:9.4
+#
+#    working_directory: ~/repo
+#
+#    environment:
+#      # Customize the JVM maximum heap limit
+#      JVM_OPTS: -Xmx3200m
+#      TERM: dumb
+#
+#    steps:
+#      - checkout
+#
+#      # Download and cache dependencies
+#      - restore_cache:
+#          keys:
+#          - v1-dependencies-{{ checksum "build.gradle" }}
+#          # fallback to using the latest cache if no exact match is found
+#          - v1-dependencies-
+#
+#      - run: gradle dependencies
+#
+#      - save_cache:
+#          paths:
+#            - ~/.gradle
+#          key: v1-dependencies-{{ checksum "build.gradle" }}
+#
+#      # run tests!
+#      - run: gradle test
+#
+
+
+
+# Android CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-android/ for more details
 #
 version: 2
 jobs:
   build:
+    working_directory: ~/sample-circleci-android
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+      - image: circleci/android:api-25-alpha
     environment:
-      # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
-
+      JVM_OPTS: -Xmx4g
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: gradle dependencies
-
+          key: gradle-{{ checksum "build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
       - save_cache:
           paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
-      # run tests!
-      - run: gradle test
+          - ~/.gradle
+          key: gradle-{{ checksum "build.gradle" }}
+      - run:
+          name: Run Detekt
+          command: ./gradlew detekt
+      - run:
+          name: Run Ktlint
+          command: ./gradlew ktlint
+      - run:
+          name: Run Lint
+          command: ./gradlew lintDebug
+      - run:
+          name: Run Unit Tests
+          command: ./gradlew testDebugUnitTest
